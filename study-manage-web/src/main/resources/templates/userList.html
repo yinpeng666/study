@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="lib/jquery.min.js"></script>
+    <script type="text/javascript" src="lib/jquery.pagination.js"></script>
+</head>
+<body>
+<form id="ff" method="post">
+    <input id="queryKey" class="easyui-textbox" data-options="" style="width:300px" value="邮箱/手机/昵称/姓名">
+    <select id="status" class="easyui-combobox" name="dept" style="width:200px;">
+        <option value="null"></option>
+        <option value="1">正常</option>
+        <option value="0">冻结</option>
+
+    </select>
+    <input id="startTime" class="easyui-datetimebox" name="registerTime"
+           data-options="required:true,showSeconds:false,currentText:'当前',
+           closeText:'关闭',okText:'确定'" value="" style="width:150px">
+    <input id="endTime" class="easyui-datetimebox" name="registerTime"
+           data-options="required:true,showSeconds:false,currentText:'当前',
+           closeText:'关闭',okText:'确定'" value="" style="width:150px">
+    <a id="btn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="javascript:queryUserList()">查找学员</a>
+</form>
+<table id="dg"  title="学员列表">
+    <thead>
+    <tr>
+        <!--field：实体类的字段名-->
+        <th data-options="field:'email'" width="12%">邮箱 </th>
+        <th data-options="field:'mobile'" width="12%">手机号</th>
+        <th data-options="field:'userName'" width="12%">用户名</th>
+        <th data-options="field:'showName'" width="12%">昵称</th>
+        <th data-options="field:'sex'" width="10%">性别</th>
+        <th data-options="field:'age'" width="10%">年龄</th>
+        <th data-options="field:'createTime'" width="12%">注册时间</th>
+        <th data-options="field:'isAvalible'" width="10%">状态</th>
+        <th data-options="" width="10%">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+
+
+    </tbody>
+    <tfoot>
+    <tr >
+        <td colspan="6" align="center">
+            <ul class="pagination"></ul>
+        </td>
+    </tr>
+
+    </tfoot>
+</table>
+</body>
+<script src="layer/layer.js"></script>
+
+<script type="text/javascript">
+    var json = {
+        pageno:1,
+        pagesize:5
+    };
+
+    $(function () {
+        alert("开始了");
+        queryPage(1);
+    });
+
+
+
+    function queryPage(pageno){
+        json.pageno = pageno ;
+
+        //异步分页查询。
+        $.ajax({
+            type:"POST",
+            url:"queryUserPage",
+            data:json,
+            success:function(result){
+                if(result.success){
+
+                    var page = result.data ; //将page对象放置在result集合中，以 "data"作为key
+                    var list = page.datas; //获取当前页数据。
+
+                    var content = '';
+
+                    $.each(list,function(i,e){
+                        content+='<tr>';
+                        content+='    <td>'+e.email+'</td>';
+                        content+='    <td>'+e.mobile+'</td>';
+                        content+='    <td>'+e.userName+'</td>';
+                        content+='    <td>'+e.showName+'</td>';
+                        content+='    <td>'+e.sex+'</td>';
+                        content+='    <td>'+e.age+'</td>';
+                        content+='    <td>'+e.createTime+'</td>';
+                        content+='    <td>'+e.isAvalible+'</td>';
+                        content+='</tr>';
+                    }); //i-索引     e-迭代的元素
+                    alert("开始刷新页面");
+                    $("tbody").html(content);   //局部刷新
+
+
+                    var pagenavg = '';
+                    if(page.pageno==1){
+                        pagenavg +='<li class="disabled"><a href="#">上一页</a></li>';
+                    }else{
+                        pagenavg +='<li><a onclick="queryPage('+(page.pageno-1)+')">上一页</a></li>';
+                    }
+
+
+
+
+                    for(var i=1; i<= page.totalno; i++){
+                        if(i==page.pageno){
+                            pagenavg += '<li class="active"><a onclick="queryPage('+i+')">'+i+' <span class="sr-only">(current)</span></a></li>';
+                        }else{
+                            pagenavg +='<li><a onclick="queryPage('+i+')">'+i+'</a></li>';
+                        }
+                    }
+
+
+                    if(page.pageno==page.totalno){
+                        pagenavg +='<li class="disabled"><a href="#">下一页</a></li>';
+                    }else{
+                        pagenavg +='<li><a onclick="queryPage('+(page.pageno+1)+')">下一页</a></li>';
+                    }
+                    alert("开始刷新分页")
+                    $(".pagination").html(pagenavg);   //局部刷新
+                }else{
+                    layer.msg("加载数据失败", {time:1000, icon:5, shift:6});
+                }
+            }
+        });
+    }
+    function queryUserList() {
+        json.queryText = $("#queryKey").val();
+        json.isAvalible = $("#status").val();
+        json.createTime = $("#startTime").val();
+        json.lastSystemTime = $("#endTime").val();
+        /*alert($("#queryKey").val());
+        eduUser["email"] = $("#queryKey").val();
+        eduUser["mobile"] = $("#queryKey").val();
+        eduUser["userName"] = $("#queryKey").val();
+        eduUser["showName"] = $("#queryKey").val();
+        eduUser["isAvalible"] = $("#status").val();
+        eduUser["createTime"] = $("#startTime").val();
+        eduUser["lastSystemTime"] = $("#endTime").val();
+        alert(eduUser);*/
+        queryPage(1);
+        /*$.post("queryUser",eduUser,function (data) {
+
+
+        })*/
+    }
+
+
+
+
+</script>
+</html>

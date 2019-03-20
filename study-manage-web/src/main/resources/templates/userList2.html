@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form id="ff" method="post">
+    <input id="queryKey" class="easyui-textbox" data-options="" style="width:300px" value="邮箱/手机/昵称/姓名">
+    <select id="status" class="easyui-combobox" name="dept" style="width:200px;">
+        <option value="null"></option>
+        <option value="1">正常</option>
+        <option value="0">冻结</option>
+
+    </select>
+    <input id="startTime" class="easyui-datetimebox" name="registerTime"
+           data-options="required:true,showSeconds:false,currentText:'当前',
+           closeText:'关闭',okText:'确定'" value="" style="width:150px">
+    <input id="endTime" class="easyui-datetimebox" name="registerTime"
+           data-options="required:true,showSeconds:false,currentText:'当前',
+           closeText:'关闭',okText:'确定'" value="" style="width:150px">
+    <a id="btn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="javascript:reloadUserList()">查找学员</a>
+</form>
+<table id="dg"  title="学员列表">
+    <!--<thead>
+    <tr>
+        &lt;!&ndash;field：实体类的字段名&ndash;&gt;
+        <th data-options="field:'email'" width="12%">邮箱 </th>
+        <th data-options="field:'mobile'" width="12%">手机号</th>
+        <th data-options="field:'userName'" width="12%">用户名</th>
+        <th data-options="field:'showName'" width="12%">昵称</th>
+        <th data-options="field:'sex'" width="10%">性别</th>
+        <th data-options="field:'age'" width="10%">年龄</th>
+        <th data-options="field:'createTime'" width="12%">注册时间</th>
+        <th data-options="field:'isAvalible'" width="10%">状态</th>
+        <th data-options="" width="10%">操作</th>
+    </tr>
+    </thead>-->
+</table>
+</body>
+<script type="text/javascript">
+    function reloadUserList() {
+        var user = {
+            /*email:$("#queryKey").val(),
+            mobile:$("#queryKey").val(),
+            userName:$("#queryKey").val(),
+            showName:$("#queryKey").val(),
+            isAvalible:$("#status").val(),
+            createTime:$("#startTime").val(),
+            lastSystemTime:$("#endTime").val(),*/
+        };
+        user["email"] = $("#queryKey").val();
+        user["mobile"] = $("#queryKey").val();
+        user["userName"] = $("#queryKey").val();
+        user["showName"] = $("#queryKey").val();
+        user["isAvalible"] = $("#status").val();
+        user["createTime"] = $("#startTime").val();
+        user["lastSystemTime"] = $("#endTime").val();
+        alert(user);
+                $("#dg").datagrid({
+                    // method:post,
+                    url:"queryUser",
+                    queryParams:user,
+                    columns:[
+                           [
+                                {field:'email',title:'邮箱',width:'14%'},
+                                {field:'mobile',title:'手机号',width:'10%'},
+                                {field:'userName',title:'用户名',width:'6%'},
+                                {field:'showName',title:'昵称',width:'6%'},
+                                {field:'sex',title:'性别',width:'6%',formatter:function(value,rec){
+                                        return rec.sex==1?'男':'女';
+                                    }},
+                                {field:'age',title:'年龄',width:'6%'},
+                                {field:'createTime',title:'注册时间',width:'12%'},
+                                {field:'isAvalible',title:'状态',width:'6%',formatter:function(value,rec){
+                                        return rec.isAvalible==1?'正常':'冻结';
+                                    }},
+
+                               /*{field:'operate',title:'操作',align:'center',width:$(this).width()*0.1,
+                                   formatter:function(value, row, index){
+                                       var str = '<a href="#" cla name="opera" class="easyui-linkbutton" >修改密码</a>&nbsp;&nbsp;<a href="#" name="opera" class="easyui-linkbutton" >冻结</a>';
+
+                                       return str;
+                                   }}*/
+
+                         ]
+                        /*}*/
+                    ],
+                    toolbar: [{
+                        iconCls: 'icon-edit',
+                        handler: function(){alert('编辑按钮')}
+                    },'-',{
+                        iconCls: 'icon-help',
+                        handler: function(){alert('帮助按钮')}
+                    }]
+
+                })
+
+    }
+
+
+
+
+</script>
+</html>

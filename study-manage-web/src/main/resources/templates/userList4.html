@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form id="ff" method="post">
+    <input id="queryKey" class="easyui-textbox" data-options="" style="width:300px" >
+    <!--value="邮箱/手机/昵称/姓名"-->
+    <select id="status" class="easyui-combobox" name="dept" style="width:200px;">
+        <option value="" selected>请选择状态</option>
+        <option value="1">正常</option>
+        <option value="0">冻结</option>
+
+    </select>
+    <input id="startTime" class="easyui-datetimebox" name="registerTime"
+           data-options="required:true,showSeconds:false,currentText:'当前',
+           closeText:'关闭',okText:'确定'" value="" style="width:150px">
+    <input id="endTime" class="easyui-datetimebox" name="registerTime"
+           data-options="required:true,showSeconds:false,currentText:'当前',
+           closeText:'关闭',okText:'确定'" value="" style="width:150px">
+    <a id="btn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="javascript:reloadUserList()">查找学员</a>
+</form>
+<table id="dg"  title="学员列表">
+    <!--<thead>
+    <tr>
+        &lt;!&ndash;field：实体类的字段名&ndash;&gt;
+        <th data-options="field:'email'" width="12%">邮箱 </th>
+        <th data-options="field:'mobile'" width="12%">手机号</th>
+        <th data-options="field:'userName'" width="12%">用户名</th>
+        <th data-options="field:'showName'" width="12%">昵称</th>
+        <th data-options="field:'sex'" width="10%">性别</th>
+        <th data-options="field:'age'" width="10%">年龄</th>
+        <th data-options="field:'createTime'" width="12%">注册时间</th>
+        <th data-options="field:'isAvalible'" width="10%">状态</th>
+        <th data-options="" width="10%">操作</th>
+    </tr>
+    </thead>-->
+</table>
+<!--填写代码 dialog对话-->
+<div id="dlg" class="easyui-dialog" title="修改密码" style="width:400px;height:200px;"
+     closed="true"  data-options="iconCls:'icon-save',resizable:true,modal:true" buttons="#bb" >
+    <form id="editPasswordForm">
+        <table cellpadding=3>
+            <tr>
+              <td>新密码：</td>
+                <td><input  data-options="validType:'length[3,6]'" id="txtNewPass"  class="txt01 easyui-passwordbox" style="height: 20px"/></td>
+            </tr>
+    <tr></tr>
+
+              <tr>
+
+    <td>确认密码：</td>
+                 <td><input  data-options="validType:'length[3,6]'" id="txtRePass"  class="txt01 easyui-passwordbox" style="height: 20px"/></td>
+             </tr>
+         </table>
+    </form>
+</div>
+<div id="bb">
+    <a id="btnEp" href="#" class="easyui-linkbutton" icon="icon-ok" onclick="saveAttr()">保存</a>
+    <a href="#" class="easyui-linkbutton" icon="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">取消</a>
+</div>
+<div id="pp" style="background:#efefef;border:1px solid #ccc;"></div>
+</body>
+
+<script type="text/javascript">
+    function reloadUserList() {
+        var eduUser = {
+
+        };
+        /*eduUser["email"] = $("#queryKey").val();
+        eduUser["mobile"] = $("#queryKey").val();
+        eduUser["userName"] = $("#queryKey").val();
+        eduUser["showName"] = $("#queryKey").val();*/
+        eduUser["isAvalible"] = $("#status").getValue();
+        alert($("#status").getValue());
+        eduUser["createTime"] = $("#startTime").val();
+        alert($("#startTime").val());
+        eduUser["lastSystemTime"] = $("#endTime").val();
+        alert($("#endTime").val());
+        var parmText = $("#queryKey").val();
+        alert($("#queryKey").val());
+        var parm = {eduUser,parmText};
+
+    }
+
+//修改密码
+    function updatePwd() {
+        $("#editPasswordForm").form("clear");
+
+        // 点击按钮，弹出对话框。
+        $("#dlg").dialog('open');
+
+
+        $("#btnEp").click(function(){
+            var userRow = $("#dg").datagrid("getSelected");
+            var userId = userRow.userId;
+
+            var v = $("#editPasswordForm").form("validate");
+            if(v){
+                var v1 = $("#txtNewPass").val();
+                var v2 = $("#txtRePass").val();
+                if(v1==""){
+                    $.messager.alert("提示信息","请输入密码！","warning");
+                }
+                if(v1 == v2){
+                    $.post(
+                        "editPassword",
+                        {"password":v1,
+                            "userId":userId},
+                        function(data){
+                            if(data == 1){
+                                //修改成功，关闭修改密码窗口
+                                $("#dlg").window("close");
+                            }else{
+                                //修改密码失败，弹出提示
+                                $.messager.alert("提示信息","密码修改失败！","error");
+                            }
+                        }
+
+                    );
+                }else{
+                    //两次输入不一致，弹出错误提示
+                    $.messager.alert("提示信息","两次密码输入不一致！","warning");
+                }
+            }
+        });
+    }
+
+    //分页显示数据
+    $('#dg').datagrid({ loadFilter: pagerFilter }).datagrid({
+        url: 'queryUser',     //加载数据
+        columns:[
+            [
+                {field:'email',title:'邮箱',width:'14%'},
+                {field:'mobile',title:'手机号',width:'10%'},
+                {field:'userName',title:'用户名',width:'6%'},
+                {field:'showName',title:'昵称',width:'6%'},
+                {field:'sex',title:'性别',width:'6%',formatter:function(value,rec){
+                        return rec.sex==1?'男':'女';
+                    }},
+                {field:'age',title:'年龄',width:'6%'},
+                {field:'createTime',title:'注册时间',width:'12%'},
+                {field:'isAvalible',title:'状态',width:'6%',formatter:function(value,rec){
+                        return rec.isAvalible==1?'正常':'冻结';
+                    }},
+
+                {field:'operate',title:'操作',align:'center',width:$(this).width()*0.1,
+                    formatter:function(value, row, index){
+
+                        var btn = row.isAvalible==1?"冻结":"解冻";
+
+                        var str = '<a href="#" onclick="updatePwd()" name="opera" class="easyui-linkbutton" >修改密码</a>&nbsp;&nbsp;' +
+                            '<a id="'+row.userId+'" class="changeStaus" onclick="demo1('+index+')" href="#" name="opera" class="easyui-linkbutton">'+btn+'</a>';
+
+                        return str;
+                    }}
+
+            ]
+
+        ],
+        pagination:true,
+        pageSize:10,
+        pageNumber:1,
+        pageList:[5, 10, 15]
+    });
+
+    // 分页数据的操作
+    function pagerFilter(data) {
+
+        if (typeof data.length == 'number' && typeof data.splice == 'function') {   // is array
+            data = {
+                total: data.length,
+                rows: data
+            }
+        }
+        var dg = $(this);
+        var opts = dg.datagrid('options');
+        var pager = dg.datagrid('getPager');
+        pager.pagination({
+            onSelectPage: function (pageNum, pageSize) {
+                opts.pageNumber = pageNum;
+                opts.pageSize = pageSize;
+                pager.pagination('refresh', {
+                    pageNumber: pageNum,
+                    pageSize: pageSize
+                });
+                dg.datagrid('loadData', data);
+            }
+        });
+        if (!data.originalRows) {
+            data.originalRows = (data.rows);
+        }
+        var start = (opts.pageNumber - 1) * parseInt(opts.pageSize);
+        var end = start + parseInt(opts.pageSize);
+        data.rows = (data.originalRows.slice(start, end));
+        return data;
+    }
+//冻结&解冻
+    /*var demo = ['解冻','冻结'];
+    var index = 0;*/
+    function demo1(index){
+        var row =$("#dg").datagrid('selectRow', index);
+        var userId = row.datagrid("getSelected").userId;
+        var isAvalible = row.datagrid("getSelected").isAvalible;
+
+        $.post(
+            "changeAvalible",
+            {
+                userId:userId,
+                isAvalible:isAvalible
+            },
+            function (date) {
+                if (isAvalible==1){
+                    isAvalible=0;
+                } else {
+                    isAvalible=1;
+                }
+
+                if(date==1){
+                    $('#dg').datagrid('updateRow',{
+                        index: index,
+                        row: {
+                            isAvalible:isAvalible
+                        }
+                    });
+                }else {
+                    $.messager.alert("提示信息","状态修改失败！","error");
+                }
+
+
+
+            }
+
+        )
+        /*$(".changeStaus").text(demo[index]);
+        index++;
+        if(index == 2){
+            index = 0;
+        }*/
+    }
+
+</script>
+</html>

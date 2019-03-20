@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="edu.study.ol.user.mapper.EduUserMapper">
+
+    <select id="selectUserPage" resultType="edu.study.ol.bean.EduUser" >
+        SELECT USER_ID,MOBILE,EMAIL,USER_NAME,SHOW_NAME,SEX,AGE,
+        CREATE_TIME,IS_AVALIBLE,PASSWORD,PIC_IMG,BANNER_URL,
+        MSG_NUM,SYS_MSG_NUM,LAST_SYSTEM_TIME
+        FROM edu_user
+        <where >
+            CREATE_TIME between #{eduUser.createTime} and #{eduUser.lastSystemTime}
+            <if test="eduUser.isAvalible!=null and eduUser.isAvalible.trim()!=''">
+                and IS_AVALIBLE = #{eduUser.isAvalible}
+            </if>
+            <if test="eduUser.mobile!=null and eduUser.mobile.trim()!=''">
+                or MOBILE = #{queryText}
+            </if>
+            <if test="eduUser.email!=null and eduUser.email.trim()!=''">
+                or EMAIL = #{queryText}
+            </if>
+            <if test="userName!=null and userName.trim()!=''">
+                or USER_NAME = #{queryText}
+            </if>
+            <if test="showName!=null and showName.trim()!=''">
+                or SHOW_NAME = #{queryText}
+            </if>
+        </where>
+        LIMIT #{startindex},#{pagesize}
+    </select>
+
+    <select id="selectTotalsize" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM `edu_user`
+        <where>
+            <if test="eduUser.isAvalible!=null and eduUser.isAvalible.trim()!=''">
+                and IS_AVALIBLE = #{eduUser.isAvalible}
+            </if>
+
+            <if test="eduUser.createTime!=null and eduUser.createTime.trim()!=''">
+                and CREATE_TIME &gt;= #{eduUser.createTime}
+            </if>
+            <if test="eduUser.lastSystemTime!=null and eduUser.lastSystemTime.trim()!=''">
+                and LAST_SYSTEM_TIME &lt;= #{eduUser.lastSystemTime}
+            </if>
+            <if test="eduUser.mobile!=null and eduUser.mobile.trim()!=''">
+                or MOBILE = #{queryText}
+            </if>
+            <if test="eduUser.email!=null and eduUser.email.trim()!=''">
+                or EMAIL = #{queryText}
+            </if>
+            <if test="userName!=null and userName.trim()!=''">
+                or USER_NAME = #{queryText}
+            </if>
+            <if test="showName!=null and showName.trim()!=''">
+                or SHOW_NAME = #{queryText}
+            </if>
+        </where>
+    </select>
+</mapper>

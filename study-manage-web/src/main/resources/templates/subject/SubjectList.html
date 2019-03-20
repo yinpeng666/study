@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<legend>
+    <span>专业管理</span>
+    &gt;
+    <span>专业列表</span>
+</legend>
+<div >
+    <span style="color:red;">注:排序顺序为倒序,只能输入数字,输入后离开焦点则自动保存</span>
+    <ul id="option" class="easyui-tree"  th:each="rootSubject:${subjectList}" >
+        <li state="closed">
+            <span ><span th:text="${rootSubject.subjectName}" th:value="${rootSubject.subjectId}" ></span>
+            排序：<input class="easyui-textbox" onchange="function f() {
+              alert('副科级啊')
+            }" style="width:30px;height: 15px" th:value="${rootSubject.sort}">
+            </span>
+
+            <ul th:if="${rootSubject}!=null" th:each="subject:${rootSubject.childList}">
+                <li >
+                    <span ><a  href="#"  th:text="${subject.subjectName}" onclick="" ></a>
+                        排序：<input class="easyui-textbox"  style="width:30px;height: 15px" th:value="${subject.sort}"></span>
+                </li>
+
+            </ul>
+        </li>
+
+    </ul>
+
+
+</div>
+</body>
+<script type="text/javascript">
+    $(".easyui-textbox").change(function () {
+
+    })
+
+</script>
+</html>

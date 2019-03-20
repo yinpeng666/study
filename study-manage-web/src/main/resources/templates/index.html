@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>主界面</title>
+    <script type="text/javascript" src="easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="easyui/easyloader.js"></script>
+    <script type="text/javascript" src="script/jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css"  href="easyui/themes/default/easyui.css">
+
+</head>
+
+<body class="easyui-layout">
+<div data-options="region:'north',title:'头部',split:true" style="height:100px;">
+    <span style="width: 200px;font-size: 50px ">上学网</span>
+    <span class="headTitle" th:each="rootSysFunction:${sysFunctionList}" >
+        <a href="#" th:text="${rootSysFunction.functionName}" th:value="${rootSysFunction.functionId}" onclick="openTree(this)"></a>
+
+    </span>
+</div>
+<div data-options="region:'west',title:'目录',split:true" style="width:200px;" >
+    <ul id="option" class="easyui-tree"   >
+        <li th:each="rootSysFunction:${sysFunctionList}"  th:id="${rootSysFunction.functionName}"  state="closed">
+            <span  th:text="${rootSysFunction.functionName}" th:value="${rootSysFunction.functionId}" >Folder</span>
+            <ul>
+                <li th:if="${rootSysFunction}!=null" th:each="sysFunction:${rootSysFunction.childrenList}" state="closed">
+                    <span th:text="${sysFunction.functionName}"  >Sub Folder 1</span>
+                    <ul>
+                        <li th:if="${sysFunction}!=null" th:each="childSysFunction:${sysFunction.childrenList}" >
+                            <span><a th:id="${childSysFunction.functionId}"  href="#" th:value="${childSysFunction.functionUrl}" th:text="${childSysFunction.functionName}" onclick="addTab(this)" >File 11</a></span>
+                        </li>
+
+                    </ul>
+                </li>
+
+            </ul>
+        </li>
+
+    </ul>
+
+
+</div>
+<div data-options="region:'center',title:'内容'" style="padding:5px;background:#eee;">
+    <div id="tt" class="easyui-tabs" style="width:100%;height:100%;">
+
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    function addTab(a){
+        var url = $(a).attr("value");
+        var title = a.text;
+
+        if ($("#tt").tabs('exists',title)){
+            // 只能打开一个，再点击的时候，当前的这个选项卡被选中
+            $("#tt").tabs('select',title);
+        }else {
+            // 跳转到一个控制器！add
+            $('#tt').tabs('add',{
+                title:title,
+                /*实际上url 应该是一个控制器*/
+                href:url,
+                closable:true
+            });
+        }
+        return false;
+    }
+
+    function openTree(a) {
+        var functionIde = $(a).attr("value");
+        alert(functionIde);
+        var node = $('#'+functionIde).tree('find', $(a).attr("text"));
+        alert(node);
+        $('#'+functionIde).tree('expand', node.target);
+
+    }
+
+</script>
+
+
+</html>
