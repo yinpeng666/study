@@ -11,6 +11,7 @@ public class StudyTeacherServiceApplicationTests {
 
     @Test
     public void contextLoads() {
+        System.out.println("我要提交");
     }
 
 }
